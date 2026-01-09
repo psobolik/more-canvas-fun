@@ -2,7 +2,7 @@ import './style.css'
 import Point from "./Point.ts";
 import Util from "./Util.ts";
 
-enum Shapes { circle, square, triangle, line}
+enum Shapes { circle, square, triangle, pill}
 
 const SIZE_MAX = 30;
 const SIZE_MIN = 4;
@@ -43,15 +43,15 @@ const path = (ctx: CanvasRenderingContext2D, n: number) => {
 // }
 
 const drawCircles = (ctx: CanvasRenderingContext2D,
-                    x: number, y: number, r: number, fill: string) => {
+                     x: number, y: number, r: number, fill: string) => {
     const drawCircle = (x: number, y: number, r: number) => {
-        ctx.beginPath();
+        ctx.moveTo(x + r, y + r);
         ctx.ellipse(x, y, r, r, Math.PI * 4, 0, Math.PI * 2);
-        ctx.fill();
     }
     ctx.save();
     ctx.translate(CX, CY);
     ctx.fillStyle = fill;
+    ctx.beginPath();
     drawCircle(x, y, r);
     drawCircle(x, -y, r);
     drawCircle(-x, y, r);
@@ -60,6 +60,7 @@ const drawCircles = (ctx: CanvasRenderingContext2D,
     drawCircle(y, -x, r);
     drawCircle(-y, x, r);
     drawCircle(-y, -x, r);
+    ctx.fill();
     ctx.restore();
 }
 const drawSquares = (ctx: CanvasRenderingContext2D,
@@ -93,18 +94,17 @@ const drawSquares = (ctx: CanvasRenderingContext2D,
 }
 const drawPills = (ctx: CanvasRenderingContext2D, x: number, y: number, dx: number, dy: number, color: string) => {
     const drawPill = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => {
-        ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
-        ctx.stroke();
     }
     ctx.save();
     ctx.translate(CX, CY);
     ctx.strokeStyle = color;
-    ctx.lineWidth = Math.min(dx, dy);
+    ctx.lineWidth = Math.min(Math.abs(dx), Math.abs(dy));
     ctx.lineCap = "round";
     const x2 = x + dx;
     const y2 = y + dy;
+    ctx.beginPath();
     drawPill(ctx, x, y, x2, y2);
     drawPill(ctx, x, -y, x2, -y2);
     drawPill(ctx, -x, y, -x2, y2);
@@ -113,6 +113,7 @@ const drawPills = (ctx: CanvasRenderingContext2D, x: number, y: number, dx: numb
     drawPill(ctx, -y, x, -y2, x2);
     drawPill(ctx, y, -x, y2, -x2);
     drawPill(ctx, -y, -x, -y2, -x2);
+    ctx.stroke();
     ctx.restore();
 }
 const drawTriangles = (ctx: CanvasRenderingContext2D,
@@ -157,12 +158,13 @@ if (ctx == null) throw ("Failed to get context");
 let minColor = 0;
 let maxColor = 255;
 
-drawBackground(ctx);
-setInterval(() => {
-    minColor = Util.random(0, 64);
-    maxColor = Util.random(65, 255);
+const reset = (ctx: CanvasRenderingContext2D) => {
+    minColor = Util.random(0, 128);
+    maxColor = Util.random(128, 255);
     drawBackground(ctx);
-}, 15000)
+    setTimeout(() => { reset(ctx); }, Util.random(5, 15) * 1000)
+}
+reset(ctx);
 setInterval(() => {
     const x = Util.random(0, RADIUS);
     const y = Util.random(0, -RADIUS);
@@ -185,9 +187,9 @@ setInterval(() => {
                 const size_t = Util.random(SIZE_MIN, SIZE_MAX);
                 drawTriangles(ctx, x, y, size_t, color);
                 break;
-            case Shapes.line:
-                const dx = Util.random(SIZE_MIN, SIZE_MAX);
-                const dy = Util.random(SIZE_MIN, SIZE_MAX);
+            case Shapes.pill:
+                const dx = Util.random(-SIZE_MAX, SIZE_MAX);
+                const dy = Util.random(-SIZE_MAX, SIZE_MAX);
                 drawPills(ctx, x, y, dx, dy, color);
                 break;
         }
