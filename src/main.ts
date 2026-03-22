@@ -6,8 +6,10 @@ enum Shapes { circle, square, triangle, pill}
 
 const BACKGROUND_COLOR = '#000';
 
-const TOP_MARGIN = document.querySelector<HTMLElement>('header');
-const BOTTOM_MARGIN = document.querySelector<HTMLElement>('footer');
+const HEADER = document.querySelector<HTMLElement>('header');
+const TOP_MARGIN = HEADER ? HEADER.clientHeight : 0;
+const FOOTER = document.querySelector<HTMLElement>('footer');
+const BOTTOM_MARGIN = FOOTER ? FOOTER.clientHeight : 0;
 
 const SIZE_MAX = 30;
 const SIZE_MIN = 4;
@@ -16,7 +18,7 @@ const SIZE_MIN = 4;
 const DRAW_SECTIONS = false; // controls whether to draw the sections
 const SECTIONS = 8;
 const ANGLE = (2 * Math.PI) / SECTIONS;
-let g_points = [Point];
+let g_points: Point[];
 
 // The following are used to place the shapes on the canvas and may be updated by resize()
 let g_cx: number;
@@ -209,7 +211,7 @@ const run = () => {
 }
 const resize = () => {
   const canvasWidth = window.innerWidth - SIZE_MAX;
-  const canvasHeight = window.innerHeight - TOP_MARGIN.offsetHeight - BOTTOM_MARGIN.offsetHeight - SIZE_MAX;
+  const canvasHeight = window.innerHeight - TOP_MARGIN - BOTTOM_MARGIN - SIZE_MAX;
   ctx.canvas.width = canvasWidth;
   ctx.canvas.height = canvasHeight;
 
@@ -235,7 +237,7 @@ const resize = () => {
 const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
 if (!canvas) throw ("No canvas");
 
-const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
+const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 if (ctx == null) throw ("Failed to get context");
 
 window.addEventListener('resize', resize);
