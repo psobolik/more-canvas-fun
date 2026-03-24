@@ -173,7 +173,6 @@ const run = () => {
   const y = Util.random(0, -g_radius);
   path(ctx, 1);
   if (ctx.isPointInPath(x, y)) {
-    console.log("hit");
     const red = Util.random(g_minColor, g_maxColor).toString();
     const green = Util.random(g_minColor, g_maxColor).toString();
     const blue = Util.random(g_minColor, g_maxColor).toString();
